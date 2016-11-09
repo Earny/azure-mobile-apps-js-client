@@ -39,7 +39,12 @@ exports.login = function (startUri, endUri, callback) {
         return;
     }
 
-    var loginWindow = window.open(startUri, "_blank", "location=no,resizable=yes"),
+    var width = 599;
+    var height = 600;
+    var left = (window.screen && window.screen.width) ? window.screen.width / 2 - width / 2 : NaN;
+    var top = (window.screen && window.screen.height) ? window.screen.height / 2 - height / 2 : NaN;
+
+    var loginWindow = window.open(startUri, "_blank", "toolbar=no,location=yes,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,copyhistory=no,width=" + width + ",height=" + height + (!isNaN(top) ? ",top=" + top : "") + (!isNaN(left) ? ",left=" + left : "")),
         complete = function(errorValue, oauthValue) {
             // Clean up event handlers, windows, frames, ...
             window.clearInterval(checkForWindowClosedInterval);
@@ -53,7 +58,7 @@ exports.login = function (startUri, endUri, callback) {
             if (intermediateIframe) {
                 intermediateIframe.parentNode.removeChild(intermediateIframe);
             }
-            
+
             // Finally, notify the caller
             callback(errorValue, oauthValue);
         },
@@ -97,7 +102,7 @@ exports.login = function (startUri, endUri, callback) {
         // For IE8
         window.attachEvent("onmessage", handlePostMessage);
     }
-    
+
     // Permit cancellation, e.g., if the app tries to login again while the popup is still open
     return {
         cancelCallback: function () {

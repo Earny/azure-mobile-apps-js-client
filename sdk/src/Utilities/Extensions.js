@@ -284,26 +284,31 @@ exports.fromJson = function (value) {
     /// <returns type="Object">The value as an object.</returns>
 
     var jsonValue = null;
-    if (!_.isNullOrEmpty(value)) {
-        // We're wrapping this so we can hook the process and perform custom JSON
-        // conversions
-        jsonValue = JSON.parse(
-            value,
-            function (k, v) {
-                // Try to convert the value as a Date
-                if (_.isString(v) && !_.isNullOrEmpty(v)) {
-                    var date = exports.tryParseIsoDateString(v);
-                    if (!_.isNull(date)) {
-                        return date;
+    try {
+        if (!_.isNullOrEmpty(value)) {
+            // We're wrapping this so we can hook the process and perform custom JSON
+            // conversions
+            jsonValue = JSON.parse(
+                value,
+                function (k, v) {
+                    // Try to convert the value as a Date
+                    if (_.isString(v) && !_.isNullOrEmpty(v)) {
+                        var date = exports.tryParseIsoDateString(v);
+                        if (!_.isNull(date)) {
+                            return date;
+                        }
                     }
-                }
 
-                // TODO: Convert geolocations once they're supported
-                // TODO: Expose the ability for developers to convert custom types
+                    // TODO: Convert geolocations once they're supported
+                    // TODO: Expose the ability for developers to convert custom types
 
-                // Return the original value if we couldn't do anything with it
-                return v;
-            });
+                    // Return the original value if we couldn't do anything with it
+                    return v;
+                });
+        }
+    } catch(e) {
+        console.error(e);
+        jsonValue = null;
     }
 
     return jsonValue;
